@@ -9,7 +9,7 @@ def find_da_string(str) -> str or None:
     matches: list = get_close_matches(user_input, ['ไปเกษตรศาสตร์', 'puppy','ael','e','a'], n=1, cutoff=0.6)
     return matches if matches else None
 
-print(read_json("dialogset.json"))
+print(read_json("dialog_set.json"))
 
 while True:
     user_input: str = input('You: ')
