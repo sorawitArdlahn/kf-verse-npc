@@ -1,22 +1,11 @@
-import json
+from services import service
 from difflib import *
-import os
 
-def read_json(file_location: str):
-    return json.load(open(file_location,"r",encoding = 'utf-8'))
-    
-def find_da_string(str) -> str or None:
-    matches: list = get_close_matches(user_input, ['ไปเกษตรศาสตร์', 'puppy','ael','e','a'], n=1, cutoff=0.6)
-    return matches if matches else None
+service = service()
 
-print(read_json("dialog_set.json"))
-
+print("สวัสดีครับ ยินดีต้อนรับสู่ kuverse\nผมคือ AI สุดชาญฉลาด พร้อมตอบคำถามของคุณ")
 while True:
-    user_input: str = input('You: ')
-    if user_input == '=ext': 
+    user_input = input('You: ')
+    if user_input == '0': 
         break
-    result = find_da_string(user_input)
-    if result == None:
-        print("ยังไม่เข้าใจคำถามครับ")
-    elif result != None:
-        print(result)
+    print(service.get_answer(service.find_matching_group(user_input)))
