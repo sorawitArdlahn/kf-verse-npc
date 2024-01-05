@@ -8,4 +8,4 @@ while True:
     user_input = input('You: ')
     if user_input == '0': 
         break
-    print(service.get_answer(service.find_matching_group(user_input)))
+    print(service.get_answer(service.find_question_group(service.find_closest_question(user_input))))
