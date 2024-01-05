@@ -1,5 +1,4 @@
 from services import service
-from difflib import *
 
 service = service()
 
