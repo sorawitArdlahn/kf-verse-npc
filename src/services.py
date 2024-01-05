@@ -41,16 +41,15 @@ class service:
     def find_closest_question(self, msg: str):
         all_questions = self.get_all_questions()
         matches: list = get_close_matches(msg, all_questions, n=1, cutoff=0.7)
-        return matches[0] if matches else ""
+        self.save_questions_log("match", msg) if matches else self.save_questions_log("mismatch", msg)
+        return matches[0]  if matches else ""
 
     def find_question_group(self, question: str):
         finding_group = self.dialog_dict.copy()
         finding_group.pop("")
         for i in finding_group:
             if question in finding_group[i]["question"]:
-                self.save_questions_log("match", question)
                 return i
-        self.save_questions_log("mismatch", question)
         return ""
 
     def save_questions_log(self, dialog_type, question):
@@ -62,7 +61,7 @@ class service:
         self.questions_log[dialog_type] = dialog_key
 
         with open(self.datafile["log"], "w", encoding="utf-8") as file:
-            json.dump(self.questions_log, file, indent=4)
+            json.dump(self.questions_log, file, indent=4, ensure_ascii=False)
 
     # return list of answers from group
     def get_answers(self, from_group: str = ""):
