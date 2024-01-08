@@ -6,7 +6,7 @@ from difflib import get_close_matches
 class service:
     datafile = {
         "dialog_set": "./resource/dialog_set.json",
-        "log": "./resource/log.json",
+        "log": "./resource/matching_stat.json",
     }
     dialog_dict = {}
     questions_log = {}
@@ -41,7 +41,7 @@ class service:
     def find_closest_question(self, msg: str):
         all_questions = self.get_all_questions()
         matches: list = get_close_matches(msg, all_questions, n=1, cutoff=0.7)
-        self.save_questions_log("match", msg) if matches else self.save_questions_log("mismatch", msg)
+        self.save_questions_log_match("match", msg, matches[0]) if matches else self.save_questions_log_mismatch("mismatch", msg)
         return matches[0]  if matches else ""
 
     def find_question_group(self, question: str):
@@ -52,12 +52,31 @@ class service:
                 return i
         return ""
 
-    def save_questions_log(self, dialog_type, question):
-        dialog_key = self.questions_log.get(dialog_type, {})
+    def save_questions_log_mismatch(self, dialog_type, question):
+        dialog_key = self.questions_log.get(dialog_type)
         if question in dialog_key:
             dialog_key[question] += 1
         else:
             dialog_key[question] = 1
+
+        self.questions_log[dialog_type] = dialog_key
+
+        with open(self.datafile["log"], "w", encoding="utf-8") as file:
+            json.dump(self.questions_log, file, indent=4, ensure_ascii=False)
+
+    def save_questions_log_match(self, dialog_type, question, detected_question):
+        dialog_key = self.questions_log.get(dialog_type)
+        group_question = self.find_question_group(detected_question)
+        if question in dialog_key:
+            dialog_key[question]["amount"] += 1
+        else:
+            new_data = {
+                    "group": group_question,
+                    "amount": 0,
+                    "detected_question": detected_question
+            }
+            self.questions_log[dialog_type][question] = new_data
+
         self.questions_log[dialog_type] = dialog_key
 
         with open(self.datafile["log"], "w", encoding="utf-8") as file:
